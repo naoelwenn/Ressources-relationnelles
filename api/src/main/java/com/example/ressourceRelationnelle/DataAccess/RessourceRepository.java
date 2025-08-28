@@ -12,9 +12,4 @@ import java.util.Optional;
 public interface RessourceRepository extends JpaRepository<Ressource, Long> {
     public List<Ressource> findAll();
     public Optional<Ressource> findById(Long id);
-
-    //-- lister les ressources selon un type de relation
-    @Query("SELECT r FROM Ressource r JOIN r.type_relation tr WHERE tr.id = :typeRelationId")
-    public List<Ressource> findByTypeRelationId(@Param("typeRelationId") Long typeRelationId);
-
 }
