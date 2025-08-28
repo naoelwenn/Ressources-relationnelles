@@ -1,0 +1,3 @@
+- `api/` : application Spring Boot
+- `client/` : application React Native (Expo)
+- `db/` : migrations SQL (Flyway/Liquibase)

@@ -1,0 +1,13 @@
+api/target
+api/.idea
+api/*iml
+api/classpath
+api/.project
+api/.settings/
+client/node_modules
+client/.expo/
+client/.expo-shared/
+client/npm-debug.log*
+client/yarn-error.log*
+**/.env
+**/.env.*
