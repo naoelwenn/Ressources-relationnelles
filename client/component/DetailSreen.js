@@ -1,14 +1,32 @@
-import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Alert  } from 'react-native';
+import { Text, View, Image, TouchableOpacity, Alert, Platform  } from 'react-native';
 import { useState, useEffect } from 'react';
 import { SafeAreaView} from 'react-native';
+import Header from '../component/Header';
+import globalStyles from '../Styles/globalStyles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function DetailsScreen({ navigation, route }) {
   const [ressource, setRessource] = useState(null);
+  const [file, setFile] = useState("");
+  const [userId, setUserId] = useState(null);
 
-  //-- liste les ressources
+  //-- récupère l'id de l'utilisateur connecté
+  useEffect(()=>{
+    const fetchUser = async () => {
+      try {
+        const id = await AsyncStorage.getItem('userId');
+        setUserId(id);
+      } catch (err) {
+        console.error('Erreur chargement user id:', err);
+      }
+    };
+    fetchUser();
+  })
+
+  //-- récupère les infos de la ressource
   const fetchRessource = (id) => {
-    fetch(`http://localhost:8080/api/ressources/${id}`)
+    fetch(process.env.EXPO_PUBLIC_API_URL + `ressources/${id}`)
       .then((res) => {
         console.log("Status de la réponse:", res.status); 
         if (!res.ok) throw new Error("Réponse réseau non OK");
@@ -36,7 +54,7 @@ export default function DetailsScreen({ navigation, route }) {
     const isConfirmed =  await confirmation(); // Attendre la confirmation de l'utilisateur
     if (isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:8080/api/ressources/${ressource.id}`, {
+        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + `ressources/${ressource.id}`, {
           method: 'DELETE',
         });
     
@@ -54,9 +72,65 @@ export default function DetailsScreen({ navigation, route }) {
   //-- demande la confirmation avant suppression
   const confirmation = () => {
     return new Promise((resolve) => {
-      const confirmed = window.confirm("Voulez-vous vraiment supprimer cette ressource ?");
-      resolve(confirmed);
+      if (Platform.OS === 'web') {
+        const confirmed = window.confirm("Voulez-vous vraiment supprimer cette ressource ?");
+        resolve(confirmed);
+      }else{
+        Alert.alert(
+          "Confirmation",
+          "Voulez-vous vraiment supprimer cette ressource ?",
+          [
+            {
+              text: "Annuler",
+              style: "cancel",
+              onPress: () => resolve(false),
+            },
+            {
+              text: "Supprimer",
+              style: "destructive",
+              onPress: () => resolve(true),
+            },
+          ],
+          { cancelable: true }
+        );
+      }
+
     });
+  };
+
+  //-- controle la présence d'un fichier uploadé
+  useEffect(()=>{
+    const fileExist = async()=>{
+      try{
+        const { ressourceId } = route.params;
+        const reponse = await fetch(process.env.EXPO_PUBLIC_API_URL + `ressources/${ressourceId}/fileExist`); 
+        if (!reponse.ok) throw new Error("Reponse réseau non ok");
+    
+        const data = await reponse.text();
+        setFile(data);
+      } catch(error){
+        console.error("FileExist : Erreur de fetch", error);
+      };
+    };
+    fileExist();
+  }, []); 
+
+  //-- téléchargement du fichier de la ressource
+  const handleDownload = () => {
+    const downloadUrl = process.env.EXPO_PUBLIC_API_URL + `ressources/${ressource.id}/download`;
+    window.open(downloadUrl, '_blank');
+  };
+
+  //-- format de date : 15/05/2025 15:19
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Mois de 0 à 11
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
   
   //-- affiche Loading si les infos ne sont pas récupérées
@@ -68,78 +142,47 @@ export default function DetailsScreen({ navigation, route }) {
 
   //-- Affichage
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={globalStyles.container}>
+      <Header/>
+      <View style={globalStyles.container}>
         {/* fiche de la ressource */}
         <Image
             source={{ uri: "https://cdn-icons-png.flaticon.com/32/716/716784.png" }} // icone dossier pour exemple
-            style={styles.image}
+            style={globalStyles.image}
         />
-        <Text style={styles.title}>{ressource.titre}</Text>
-        <Text style = {styles.text}>Crée le : {ressource.dateCreation}</Text>
-        <Text style = {styles.text}>Relation : {ressource.type_relation?.map(tr => tr.libelle).join(", ")}</Text>
-        <Text style = {styles.text}>Catégorie : {ressource.categorie_ressource.libelle}</Text>
-        <Text style = {styles.text}>Type : {ressource.type_ressource.libelle}</Text>
-        <Text style = {styles.text}>{ressource.contenu}</Text>
+        <Text style={globalStyles.ressourceTitle}>{ressource.titre}</Text>
+        <Text style = {globalStyles.ressourceText}>Crée le : {formatDate(ressource.dateCreation)} par {ressource.utilisateur.pseudo}</Text>
+        <Text style = {globalStyles.ressourceText}>Relation : {ressource.type_relation?.map(tr => tr.libelle).join(", ")}</Text>
+        <Text style = {globalStyles.ressourceText}>Catégorie : {ressource.categorie_ressource.libelle}</Text>
+        <Text style = {globalStyles.ressourceText}>Type : {ressource.type_ressource.libelle}</Text>
+        <Text style = {globalStyles.ressourceText}>{ressource.contenu}</Text>
 
-        {/* bouton de modification */}
-        <TouchableOpacity
-        style={styles.editButton}
-        onPress={() => navigation.navigate('Edition', { ressourceId: ressource.id })}
-        >
-          <Text style={styles.editButtonText}>Modifier</Text>
-        </TouchableOpacity>
+        {/* bouton de téléchargement : seulement si un fichier est présent*/}
+        {file != "" && (
+          <TouchableOpacity style={globalStyles.standardButton} onPress={handleDownload}>
+            <Text style={globalStyles.standardButtonText}>Télécharger le fichier</Text>
+          </TouchableOpacity>
+        )}
 
-        {/* bouton de suppression */}
-        <TouchableOpacity
-        style={styles.editButton}
-        onPress={deleteRessource}>
-          <Text style={styles.editButtonText}>Supprimer</Text>
-        </TouchableOpacity>
-        
+        {file != "" && (<Text style = {globalStyles.ressourceText}>Fichier : {file}</Text>)}
+
+        {/* bouton de modification : seulement pour l'auteur de la ressource */}
+        {userId == ressource.utilisateur.id && (
+          <TouchableOpacity style={globalStyles.standardButton} onPress={() => navigation.navigate('Edition', { ressourceId: ressource.id })}>
+            <Text style={globalStyles.standardButtonText}>Modifier</Text>
+          </TouchableOpacity>
+        )}
+
+        {/* bouton de suppression : seulement pour l'auteur de la ressource */}
+        {userId == ressource.utilisateur.id && (
+          <TouchableOpacity
+          style={globalStyles.standardButton}
+          onPress={deleteRessource}>
+            <Text style={globalStyles.standardButtonText}>Supprimer</Text>
+          </TouchableOpacity>
+        )}
+
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  image: {
-    width: 100,
-    height: 100,
-    resizeMode: "contain",
-    alignSelf: "center"
-  },
-  title: {
-    fontSize: 16,
-    color: "#333",
-    fontWeight: "500",
-    marginTop: 8,
-    textAlign: "center",
-  },
-  text: {
-    fontSize: 14,
-    color: "#333",
-    marginTop: 8,
-    textAlign: "center",
-  },
-  editButton: {
-    marginTop: 20,
-    backgroundColor: '#007AFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: 'center'
-  },
-  editButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  }
-});

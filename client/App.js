@@ -7,19 +7,26 @@ import { TextInput} from 'react-native-web';
 import HomeScreen from './component/HomeSreen';
 import DetailScreen from './component/DetailSreen';
 import EditScreen from './component/EditScreen';
+import LoginScreen from './component/LoginScreen';
+import RegisterScreen from './component/RegisterScreen';
+import { UserProvider } from './Context/UserContext';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
+    <UserProvider>
+      <NavigationContainer styles={styles.container}>
+        <Stack.Navigator initialRouteName="Ressources">
+          <Stack.Screen name="Login" component={LoginScreen}/>
+          <Stack.Screen name="Ressources" component={HomeScreen}/>
+          <Stack.Screen name="Ma ressource" component={DetailScreen} />
+          <Stack.Screen name="Edition" component={EditScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserProvider>
 
-    <NavigationContainer styles={styles.container}>
-      <Stack.Navigator initialRouteName="Ressources">
-        <Stack.Screen name="Ressources" component = {HomeScreen}/>
-        <Stack.Screen name="Ma ressource" component = {DetailScreen} />
-        <Stack.Screen name="Edition" component = {EditScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
   );
 }
 

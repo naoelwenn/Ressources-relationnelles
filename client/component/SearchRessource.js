@@ -1,7 +1,9 @@
-import { StyleSheet, Text, View, FlatList, Image, useWindowDimensions, TouchableOpacity, TextInput} from 'react-native';
+import { StyleSheet, Text, View, FlatList, Image, useWindowDimensions, TouchableOpacity, TextInput, SafeAreaView, KeyboardAvoidingView, ScrollView, Platform} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import{Picker} from '@react-native-picker/picker';
 import { useFocusEffect } from '@react-navigation/native';
+import Header from '../component/Header';
+import globalStyles from '../Styles/globalStyles';
 
 const SearchRessource = ({navigation}) =>{
   const[text, setText] = useState("");
@@ -20,11 +22,13 @@ const SearchRessource = ({navigation}) =>{
   const SPACING = ITEM_WIDTH/10; // on veut un espace égal à la largeur d’un bloc / 10
   // Calcul dynamique du nombre de colonnes selon la taille de l'écran
   const numColumns = Math.max(1, Math.floor(window.width / (ITEM_WIDTH + SPACING)));
+  
 
   //-- liste les ressources
   const fetchRessources = async()=>{
     try{
-      const reponse = await fetch("http://localhost:8080/api/ressources"); 
+      const reponse = await fetch(process.env.EXPO_PUBLIC_API_URL + "ressources"); 
+      console.log(reponse);
       if (!reponse.ok) throw new Error("Reponse réseau non ok");
   
       const data = await reponse.json();
@@ -82,7 +86,7 @@ const SearchRessource = ({navigation}) =>{
   useEffect(()=>{
     const fetchType_Relation = async()=>{
         try{
-          const reponse = await fetch("http://localhost:8080/api/type_relation"); 
+          const reponse = await fetch(process.env.EXPO_PUBLIC_API_URL + "type_relation"); 
           if (!reponse.ok) throw new Error("Reponse réseau non ok");
       
           const data = await reponse.json();
@@ -104,7 +108,7 @@ const SearchRessource = ({navigation}) =>{
   useEffect(()=>{
     const fetchCategorie_Ressource = async()=>{
         try{
-          const reponse = await fetch("http://localhost:8080/api/categorie_ressource"); 
+          const reponse = await fetch(process.env.EXPO_PUBLIC_API_URL + "categorie_ressource"); 
           if (!reponse.ok) throw new Error("Reponse réseau non ok");
       
           const data = await reponse.json();
@@ -126,7 +130,7 @@ const SearchRessource = ({navigation}) =>{
     useEffect(()=>{
       const fetchType_Ressource = async()=>{
           try{
-            const reponse = await fetch("http://localhost:8080/api/type_ressource"); 
+            const reponse = await fetch(process.env.EXPO_PUBLIC_API_URL + "type_ressource"); 
             if (!reponse.ok) throw new Error("Reponse réseau non ok");
         
             const data = await reponse.json();
@@ -148,193 +152,128 @@ const SearchRessource = ({navigation}) =>{
 
   //-- affichage 
   return (
-    <View style={styles.container}>
-
-      {/* bouton de création d'une ressource */}
-      <TouchableOpacity
-      style={styles.editButton}
-      onPress={() => navigation.navigate('Edition')}>
-        <Text style={styles.editButtonText}>Créer une ressource</Text>
-      </TouchableOpacity>
-
-      {/* combobox type de relation */}
-      <Picker
-        selectedValue={selectedTypeRelation}
-        style={styles.searchressource}
-        onValueChange={(itemValue)=>setSelectedTypeRelation(itemValue)}
+    <SafeAreaView style={globalStyles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={globalStyles.keyboardAvoidingView}
       >
-        <Picker.Item label="Tous les types de relation" value=""/>
-        {type_relation.map((type)=> (
-          <Picker.Item
-            key = {type.id}
-            label = {type.libelle ?? "Type inconnu"}
-            value = {type.id}
-          />
-        ))}
-      </Picker>
+        {/*Entete */}
+          <View>
+            <Header/>
+          </View>
 
-      {/* combobox Catégorie de ressource */}
-      <Picker
-        selectedValue={selectedCategorieRessource}
-        style={styles.searchressource}
-        onValueChange={(itemValue)=>setSelectedCategorieRessource(itemValue)}
-      >
-        <Picker.Item label="Toutes les catégories" value=""/>
-        {categorie_ressource.map((type)=> (
-          <Picker.Item
-            key = {type.id}
-            label = {type.libelle ?? "Catégorie inconnue"}
-            value = {type.id}
-          />
-        ))}
-      </Picker>
+        
+          <View style={globalStyles.container}>
 
-      {/* combobox type de ressource */}
-      <Picker
-        selectedValue={selectedTypeRessource}
-        style={styles.searchressource}
-        onValueChange={(itemValue)=>setSelectedTypeRessource(itemValue)}
-      >
-        <Picker.Item label="Tous les types de ressource" value=""/>
-        {type_ressource.map((type)=> (
-          <Picker.Item
-            key = {type.id}
-            label = {type.libelle ?? "Type inconnu"}
-            value = {type.id}
-          />
-        ))}
-      </Picker>
-      
-      {/* barre de recherche textuelle */}
-      <TextInput 
-        style={styles.searchressource}
-        placeholder="Rechercher une ressource"
-        onChangeText={setText}
-        value={text} 
-      />
-
-      {/* Liste des ressources */}
-      <FlatList
-          data={dataToDisplay}
-          numColumns={numColumns}
-          columnWrapperStyle={
-            numColumns > 1 ? styles.columnWrapper : null
-          } // ajoute de l'espacement horizontal
-          contentContainerStyle={styles.listContent}
-          renderItem={({ item }) => (
-            <View style={[styles.itemContainer, { width: ITEM_WIDTH }]}>
-              {/* clicable */}
-              <TouchableOpacity
-                onPress={()=>
-                navigation.navigate("Ma ressource", {ressourceId: item.id})
-              }>
-                {/* Image */}
-                <Image
-                  source={{ uri: "https://cdn-icons-png.flaticon.com/32/716/716784.png" }} // icone dossier pour exemple 
-                  style={styles.image}
+            {/* combobox type de relation */}
+            <View style={globalStyles.standardInputContainer}>
+              <Picker
+                selectedValue={selectedTypeRelation}
+                style={globalStyles.standardInput}
+                onValueChange={(itemValue)=>setSelectedTypeRelation(itemValue)}
+              >
+                <Picker.Item label="Tous les types de relation" value=""/>
+                {type_relation.map((type)=> (
+                <Picker.Item
+                  key = {type.id}
+                  label = {type.libelle ?? "Type inconnu"}
+                  value = {type.id}
                 />
-                {/* Titre */}
-                <Text style={styles.itemTitleText}>
-                  {item?.titre ?? "Nom inconnu"}
-                </Text>
-                {/* Types de relation */}
-                <Text style={styles.itemText}>
-                  Relation : {item.type_relation?.map(tr => tr.libelle).join(", ")}
-                </Text>
-                {/* Catégorie de ressource */}
-                <Text style={styles.itemText}>
-                  Catégorie : {item.categorie_ressource.libelle}
-                </Text>
-                {/* Type de ressource */}
-                <Text style={styles.itemText}>
-                  Type : {item.type_ressource.libelle}
-                </Text>
-              </TouchableOpacity>
+                ))}
+              </Picker>
             </View>
-          )}
-      />
-    </View>
+
+            {/* combobox Catégorie de ressource */}
+            <View style={globalStyles.standardInputContainer}>
+              <Picker
+              selectedValue={selectedCategorieRessource}
+              style={globalStyles.standardInput}
+              onValueChange={(itemValue)=>setSelectedCategorieRessource(itemValue)}
+              >
+                <Picker.Item label="Toutes les catégories" value=""/>
+                {categorie_ressource.map((type)=> (
+                <Picker.Item
+                  key = {type.id}
+                  label = {type.libelle ?? "Catégorie inconnue"}
+                  value = {type.id}
+                />
+                ))}
+              </Picker>
+            </View>
+
+
+            {/* combobox type de ressource */}
+            <View style={globalStyles.standardInputContainer}>
+              <Picker
+              selectedValue={selectedTypeRessource}
+              style={globalStyles.standardInput}
+              onValueChange={(itemValue)=>setSelectedTypeRessource(itemValue)}
+              >
+                <Picker.Item label="Tous les types de ressource" value=""/>
+                {type_ressource.map((type)=> (
+                  <Picker.Item
+                    key = {type.id}
+                    label = {type.libelle ?? "Type inconnu"}
+                    value = {type.id}
+                  />
+                ))}
+              </Picker>
+            </View>
+              
+            {/* barre de recherche textuelle */}
+            <View style={globalStyles.standardInputContainer}>
+              <TextInput 
+                style={globalStyles.standardInput}
+                placeholder="Rechercher une ressource"
+                onChangeText={setText}
+                value={text} 
+              />
+            </View>
+
+            {/* Liste des ressources */}
+            <FlatList
+                data={dataToDisplay}
+                numColumns={numColumns}
+                columnWrapperStyle={
+                  numColumns > 1 ? globalStyles.columnWrapper : null
+                } // ajoute de l'espacement horizontal
+                contentContainerStyle={globalStyles.listContent}
+                renderItem={({ item }) => (
+                  <View style={[globalStyles.itemContainer, { width: ITEM_WIDTH }]}>
+                    {/* clicable */}
+                    <TouchableOpacity
+                      onPress={()=>
+                      navigation.navigate("Ma ressource", {ressourceId: item.id})
+                    }>
+                      {/* Image */}
+                      <Image
+                        source={{ uri: "https://cdn-icons-png.flaticon.com/32/716/716784.png" }} // icone dossier pour exemple 
+                        style={globalStyles.image}
+                      />
+                      {/* Titre */}
+                      <Text style={globalStyles.itemTitleText}>
+                        {item?.titre ?? "Nom inconnu"}
+                      </Text>
+                      {/* Types de relation */}
+                      <Text style={globalStyles.itemText}>
+                        Relation : {item.type_relation?.map(tr => tr.libelle).join(", ")}
+                      </Text>
+                      {/* Catégorie de ressource */}
+                      <Text style={globalStyles.itemText}>
+                        Catégorie : {item.categorie_ressource.libelle}
+                      </Text>
+                      {/* Type de ressource */}
+                      <Text style={globalStyles.itemText}>
+                        Type : {item.type_ressource.libelle}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+            />
+          </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
-
-//-- style 
-const styles = StyleSheet.create({
-
-  searchressource: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    marginHorizontal: 10,
-    marginBottom: 15,
-    elevation: 2, // pour un peu d’ombre sur Android
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-  },  
-  container: {
-    flex: 1,
-    backgroundColor: "#f0f4f7",
-    paddingTop: 20,
-  },
-  listContent: {
-    paddingHorizontal: 10,
-  },
-  columnWrapper: {
-    justifyContent: "space-evenly", // espace égal entre les blocs
-    marginBottom: 20, // espace vertical entre les rangées
-  },
-  itemContainer: {
-    margin: 15,
-    backgroundColor: "#ffffff",
-    borderRadius: 8,
-    padding: 15,
-    borderColor: "#ddd",
-    borderWidth: 1,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
-    alignItems: "center",
-  },
-  itemTitleText: {
-    fontSize: 16,
-    color: "#333",
-    fontWeight: "500",
-    marginTop: 8,
-    textAlign: "center",
-  },
-  itemText: {
-    fontSize: 14,
-    color: "#333",
-    marginTop: 8,
-    textAlign: "center",
-  },
-  image: {
-    width: 100,
-    height: 100,
-    resizeMode: "contain",
-    alignSelf: "center"
-  },
-  editButton: {
-    marginTop: 20,
-    backgroundColor: '#007AFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: 'center'
-  },
-  editButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-});
 
 export default SearchRessource;
