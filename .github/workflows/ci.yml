@@ -20,7 +20,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Compiler et tester le backend
-        run: mvn -B clean verify --file backend/pom.xml
+        run: mvn -B clean verify --file api/pom.xml
 
   frontend:
     runs-on: ubuntu-latest
@@ -34,7 +34,7 @@ jobs:
           node-version: '18'
 
       - name: Installer dépendances
-        run: cd frontend && npm install
+        run: cd client && npm install
 
       - name: Vérifier que le front compile
-        run: cd frontend && npm run lint
+        run: cd client && npm run lint
