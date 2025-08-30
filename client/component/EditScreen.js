@@ -227,10 +227,8 @@ export default function EditScreen({ navigation, route }) {
       if (!response.ok) {
         throw new Error('Erreur lors de l’upload');
       }
-  
       const result = await response.text();
       console.log('Réponse serveur :', result);
-      //alert('Fichier uploadé avec succès !');
     } catch (error) {
       console.error('Erreur upload :', error);
       alert('Erreur upload : ' + error.message);
