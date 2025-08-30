@@ -169,7 +169,7 @@ const LoginScreen = ({ navigation }) => {
             disabled={isLoading}
           >
             <Text style={globalStyles.standardLinkText}>
-              Pas encore inscrit ? S'inscrire
+              Inscription
             </Text>
           </TouchableOpacity>
         </View>
