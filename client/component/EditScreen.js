@@ -1,4 +1,4 @@
-import {  Text, View, Image, TouchableOpacity, TextInput,Dimensions  } from 'react-native';
+import {  Text, View, Image, TouchableOpacity, TextInput } from 'react-native';
 import { useState, useEffect } from 'react';
 import { SafeAreaView, Platform } from 'react-native';
 import{Picker} from '@react-native-picker/picker';

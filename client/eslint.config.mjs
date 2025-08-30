@@ -6,16 +6,14 @@ import { defineConfig } from "eslint/config";
 export default defineConfig([
   // Config de base JavaScript
   js.configs.recommended,
+  // Recommandations React
+  react.configs.flat.recommended,
 
   // Config React
   {
     files: ["**/*.{js,mjs,cjs,jsx}"],
     plugins: {
       react,
-    },
-    rules: {
-      "react/react-in-jsx-scope": "off", // ⬅ plus nécessaire avec React 17+
-      "react/prop-types": "off"         // ⬅ désactive la validation PropTypes
     },
     settings: {
       react: {
@@ -28,8 +26,9 @@ export default defineConfig([
         ...globals.node,
       },
     },
+    rules: {
+      "react/react-in-jsx-scope": "off", // ⬅ plus nécessaire avec React 17+
+      "react/prop-types": "off"         // ⬅ désactive la validation PropTypes
+    },
   },
-
-  // Recommandations React
-  react.configs.flat.recommended,
 ]);
