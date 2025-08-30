@@ -1,12 +1,12 @@
 // component/Header.js
-import React, {useEffect, useState, useContext} from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView , useWindowDimensions, Platform, Image} from 'react-native';
+import React, {useEffect, useContext} from 'react';
+import { View, Text, TouchableOpacity, useWindowDimensions, Image} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import globalStyles from '../Styles/globalStyles';
 import { UserContext } from '../Context/UserContext';
 
-const Header = ({ user }) => {
+const Header = () => {
   const {userPseudo, setUserPseudo} = useContext(UserContext);
   const navigation = useNavigation();
   const { width } = useWindowDimensions();
