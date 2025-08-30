@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {StyleSheet, View, Text, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Alert} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import globalStyles from '../Styles/globalStyles';
 
@@ -169,7 +169,7 @@ const LoginScreen = ({ navigation }) => {
             disabled={isLoading}
           >
             <Text style={globalStyles.standardLinkText}>
-              Pas encore inscrit ? S'inscrire
+              Inscription
             </Text>
           </TouchableOpacity>
         </View>

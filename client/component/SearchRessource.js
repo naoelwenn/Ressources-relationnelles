@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList, Image, useWindowDimensions, TouchableOpacity, TextInput, SafeAreaView, KeyboardAvoidingView, ScrollView, Platform} from 'react-native';
+import {Text, View, FlatList, Image, useWindowDimensions, TouchableOpacity, TextInput, SafeAreaView, KeyboardAvoidingView, Platform} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import{Picker} from '@react-native-picker/picker';
 import { useFocusEffect } from '@react-navigation/native';
