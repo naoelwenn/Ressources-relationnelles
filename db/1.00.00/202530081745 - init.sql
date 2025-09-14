@@ -1,13 +1,4 @@
 
-
-DROP DATABASE IF EXISTS "PlateformeRessource";
-
-CREATE DATABASE "PlateformeRessource" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'fr-FR';
-
-ALTER DATABASE "PlateformeRessource" OWNER TO postgres;
-
-CREATE SCHEMA public;
-
 ALTER SCHEMA public OWNER TO pg_database_owner;
 
 
@@ -297,7 +288,6 @@ ALTER TABLE ONLY public.commentaire
 
 ALTER TABLE ONLY public.favoris
     ADD CONSTRAINT favoris_pkey PRIMARY KEY (utilisateur_id, ressource_id);
--
 
 ALTER TABLE ONLY public.participer
     ADD CONSTRAINT participer_pkey PRIMARY KEY (utilisateur_id, ressource_id);
