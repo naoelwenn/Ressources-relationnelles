@@ -1,0 +1,1 @@
+Pour lancer le déploiement de la solution, double cliquer sur le fichier Lancement.bat. 
