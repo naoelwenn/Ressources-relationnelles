@@ -1,4 +1,4 @@
-import {View, StyleSheet} from "react-native";
+import {View} from "react-native";
 import SearchRessource from "./SearchRessource";
 import globalStyles from '../Styles/globalStyles';
 export default function HomeScreen({navigation}){

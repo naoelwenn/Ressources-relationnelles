@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: PlateformeRessource
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/1.00.00:/docker-entrypoint-initdb.d
+
+  api:
+    build: ./api
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/PlateformeRessource
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: admin
+    ports:
+      - "8080:8080"
+
+  client:
+    build: ./client
+    depends_on:
+      - api
+    environment:
+      - EXPO_PUBLIC_API_URL=http://localhost:8080/api/
+      - REACT_NATIVE_PACKAGER_HOSTNAME=0.0.0.0
+      - REACT_NATIVE_PACKAGER_PORT=8081
+    ports:
+      - "8081:8081"
+    command: sh -c "npx expo start --port 8081 --web"
+
+volumes:
+  pgdata:

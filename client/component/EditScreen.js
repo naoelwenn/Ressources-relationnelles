@@ -1,5 +1,4 @@
-import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, TextInput,Dimensions, Button  } from 'react-native';
-import { Suspense, use } from 'react';
+import {  Text, View, Image, TouchableOpacity, TextInput } from 'react-native';
 import { useState, useEffect } from 'react';
 import { SafeAreaView, Platform } from 'react-native';
 import{Picker} from '@react-native-picker/picker';
@@ -8,7 +7,7 @@ import Header from '../component/Header';
 import globalStyles from '../Styles/globalStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const screenWidth = Dimensions.get('window').width; //-- récupère la largeur de la fenetre
+// const screenWidth = Dimensions.get('window').width; //-- récupère la largeur de la fenetre
 
 
 export default function EditScreen({ navigation, route }) {
@@ -228,10 +227,8 @@ export default function EditScreen({ navigation, route }) {
       if (!response.ok) {
         throw new Error('Erreur lors de l’upload');
       }
-  
       const result = await response.text();
       console.log('Réponse serveur :', result);
-      //alert('Fichier uploadé avec succès !');
     } catch (error) {
       console.error('Erreur upload :', error);
       alert('Erreur upload : ' + error.message);

@@ -1,3 +1,4 @@
+
 FROM node:20
 
 WORKDIR /app
@@ -7,7 +8,6 @@ RUN npm install -g expo-cli
 
 COPY . .
 
-EXPOSE 19006
-EXPOSE 19000
+EXPOSE 8081
 
 CMD ["npx", "expo", "start", "--web", "--host", "lan"]
