@@ -16,3 +16,4 @@ jobs:
         run: docker compose exec my-service pytest
       - name: Tear down
         run: docker compose down --volumes
+
